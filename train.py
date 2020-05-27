@@ -30,12 +30,12 @@ parser.add_argument('--combine', metavar='CHARS', type=int, default=50000, help=
 parser.add_argument('--encoding', type=str, default='utf-8', help='Set the encoding for reading and writing files.')
 
 parser.add_argument('--batch_size', metavar='SIZE', type=int, default=1, help='Batch size')
-parser.add_argument('--learning_rate', metavar='LR', type=float, default=0.00002, help='Learning rate for Adam')
+parser.add_argument('--learning_rate', metavar='LR', type=float, default=0.00004, help='Learning rate for Adam')
 parser.add_argument('--accumulate_gradients', metavar='N', type=int, default=1, help='Accumulate gradients across N minibatches.')
 parser.add_argument('--memory_saving_gradients', default=False, action='store_true', help='Use gradient checkpointing to reduce vram usage.')
 parser.add_argument('--only_train_transformer_layers', default=False, action='store_true', help='Restrict training to the transformer blocks.')
 parser.add_argument('--optimizer', type=str, default='adam', help='Optimizer. <adam|sgd>.')
-parser.add_argument('--noise', type=float, default=0.0, help='Add noise to input training data to regularize against typos.')
+parser.add_argument('--noise', type=float, default=0.3, help='Add noise to input training data to regularize against typos.')
 
 parser.add_argument('--top_k', type=int, default=40, help='K for top-k sampling.')
 parser.add_argument('--top_p', type=float, default=0.0, help='P for top-p sampling. Overrides top_k if set > 0.')
@@ -45,7 +45,7 @@ parser.add_argument('--run_name', type=str, default='run1', help='Run id. Name o
 parser.add_argument('--sample_every', metavar='N', type=int, default=100, help='Generate samples every N steps')
 parser.add_argument('--sample_length', metavar='TOKENS', type=int, default=1023, help='Sample this many tokens')
 parser.add_argument('--sample_num', metavar='N', type=int, default=1, help='Generate this many samples')
-parser.add_argument('--save_every', metavar='N', type=int, default=1000, help='Write a checkpoint every N steps')
+parser.add_argument('--save_every', metavar='N', type=int, default=200, help='Write a checkpoint every N steps')
 
 parser.add_argument('--val_dataset', metavar='PATH', type=str, default=None, help='Dataset for validation loss, defaults to --dataset.')
 parser.add_argument('--val_batch_size', metavar='SIZE', type=int, default=2, help='Batch size for validation.')
@@ -84,6 +84,10 @@ def main():
         args.memory_saving_gradients = True
         if args.optimizer == 'adam':
             args.only_train_transformer_layers = True
+    if args.model_name == '774M':
+        args.memory_saving_gradients = True
+        if args.optimizer == 'adam':
+            args.only_train_transformer_layers = False
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
